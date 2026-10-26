@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CareCircle</title>
+  <meta name="description" content="Check a text, letter, or pill before you act.">
+  <meta name="theme-color" content="#FFF8EC">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Tesseract.js reads text from photos right in the browser, so photos never leave the phone. -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<main class="page">
+
+  <!-- ============ HOME ============ -->
+  <section id="home" class="screen">
+    <div class="brand">
+      <span class="brand-dot" aria-hidden="true"></span>
+      <span class="brand-name">CareCircle</span>
+    </div>
+    <div class="intro">
+      <h1 class="display">Hi there!</h1>
+      <p class="lead">Not sure about something? Check it first.</p>
+    </div>
+
+    <button type="button" class="card card--shadow check-this" data-go="camera">
+      <span class="check-this-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+      </span>
+      <span class="check-this-title">Check This</span>
+      <span>Snap a text, a letter, or a pill</span>
+    </button>
+
+    <div class="grid-2">
+      <button type="button" class="btn btn--tile bg-peach" data-go="paste">
+        <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6v3H9z"/><path d="M9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3"/><path d="M8.5 12h7M8.5 16h5"/></svg>
+        <span>Paste a message</span>
+      </button>
+      <button type="button" class="btn btn--tile bg-mint" data-go="circle">
+        <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.4 5 2.8 5 5.8"/></svg>
+        <span>My circle</span>
+      </button>
+    </div>
+
+    <div id="last-check" class="card last-check" hidden>
+      <div>
+        <span class="muted small">Last check</span>
+        <span id="last-check-text" class="bold"></span>
+      </div>
+      <span id="last-check-tag" class="tag"></span>
+    </div>
+  </section>
+
+  <!-- ============ CAMERA ============ -->
+  <section id="camera" class="screen screen--dark" hidden>
+    <button type="button" class="btn btn--back btn--on-dark" data-go="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <p class="lead center">Take a clear photo of the words. Fill the screen and use good light.</p>
+
+    <div class="viewfinder">
+      <img id="photo-preview" alt="Your photo" hidden>
+      <p id="viewfinder-hint" class="center">Your photo will show here</p>
+    </div>
+
+    <!-- On phones, this opens the camera. The photo is read on this device. -->
+    <input id="photo-input" type="file" accept="image/*" capture="environment" hidden>
+
+    <div class="shutter-wrap">
+      <button type="button" id="shutter" class="shutter" aria-label="Take photo">
+        <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+      <span id="shutter-label" class="bold">Take photo</span>
+    </div>
+    <button type="button" id="check-photo" class="btn btn--yellow" hidden>Check this photo</button>
+    <button type="button" class="btn btn--outline-light" data-go="paste">Paste text instead</button>
+  </section>
+
+  <!-- ============ PASTE ============ -->
+  <section id="paste" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Home</span>
+    </button>
+    <h1 class="display">Paste a message</h1>
+    <label for="paste-text" class="lead">Copy the text, email, or message, then paste it here.</label>
+    <textarea id="paste-text" class="card textarea" rows="8" placeholder="Paste the message here"></textarea>
+    <button type="button" id="check-paste" class="btn btn--ink">Check this message</button>
+  </section>
+
+  <!-- ============ CHECKING ============ -->
+  <section id="checking" class="screen" hidden>
+    <button type="button" id="cancel-check" class="btn btn--back">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      <span>Cancel</span>
+    </button>
+    <div class="center stack">
+      <span class="big-dot">
+        <svg width="54" height="54" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg>
+      </span>
+      <h1 class="display">Checking it for you…</h1>
+      <p class="lead" id="checking-sub">This takes a few seconds.</p>
+    </div>
+    <ul class="card steps" aria-live="polite">
+      <li id="step-read"><span class="step-box"></span><span>Reading the words</span></li>
+      <li id="step-check"><span class="step-box"></span><span>Looking for warning signs</span></li>
+    </ul>
+    <div class="card bg-sky note">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span>Your photo stays on this phone. Nothing is saved.</span>
+    </div>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="result" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Home</span>
+    </button>
+
+    <div id="verdict" class="card card--shadow verdict">
+      <div class="verdict-row">
+        <span id="verdict-icon" aria-hidden="true"></span>
+        <h1 id="verdict-title" class="display"></h1>
+      </div>
+      <span id="verdict-tag" class="tag bg-white"></span>
+    </div>
+
+    <div class="card">
+      <span class="muted small bold">What you showed us</span>
+      <p id="shown-text" class="shown-text"></p>
+    </div>
+
+    <h2 id="reasons-heading" class="display-2"></h2>
+    <div id="reasons" class="stack-12"></div>
+
+    <div class="card bg-sky">
+      <h2 class="display-3">What to do</h2>
+      <p id="advice" class="advice"></p>
+    </div>
+
+    <div class="grid-2">
+      <button type="button" id="read-aloud" class="btn btn--shadow">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <span>Read aloud</span>
+      </button>
+      <button type="button" id="tell-family" class="btn btn--shadow bg-mint">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.4 5 2.8 5 5.8"/></svg>
+        <span>Tell family</span>
+      </button>
+    </div>
+    <button type="button" class="btn btn--ink" data-go="home">Done</button>
+  </section>
+
+  <!-- ============ ERROR ============ -->
+  <section id="error" class="screen" hidden>
+    <div class="card card--shadow bg-yellow stack">
+      <h1 class="display">Something went wrong</h1>
+      <p id="error-text" class="lead"></p>
+    </div>
+    <button type="button" class="btn btn--ink" data-go="home">Back to home</button>
+  </section>
+
+  <!-- ============ MY CIRCLE (Version 2) ============ -->
+  <section id="circle" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Home</span>
+    </button>
+    <h1 class="display">My circle</h1>
+    <div class="card card--shadow bg-mint stack">
+      <p class="lead">Soon you'll be able to add a family member who gets an alert when CareCircle spots a scam.</p>
+      <p class="lead">For now, use <strong>Tell family</strong> on any result to send it to someone you trust.</p>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

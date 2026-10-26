@@ -1,0 +1,222 @@
+/* CareCircle — "soft neo-brutalist" style.
+   Everything is built from three pieces: .card, .btn, and .tag.
+   Change the colors here and the whole app follows. */
+
+:root {
+  --ink: #1F1F1F;
+  --muted: #4D4D4D;
+  --cream: #FFF8EC;
+  --white: #FFFFFF;
+  --yellow: #FFE27A;   /* Check This */
+  --peach: #FFC2A8;
+  --mint: #BDEBD3;
+  --sky: #C9E4FF;      /* "What to do" */
+  --scam: #FF8A7A;     /* verdict: likely a scam */
+  --careful: #FFD449;  /* verdict: be careful */
+  --safe: #7FD8A6;     /* verdict: looks safe */
+
+  --border: 2.5px solid var(--ink);
+  --radius: 18px;
+  --shadow: 4px 4px 0 var(--ink);
+  --display: 'Bricolage Grotesque', 'Atkinson Hyperlegible', sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Icons: simple outlines that take the text color. */
+svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.solid { stroke: none; }
+
+/* ---------- Screens ---------- */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 20px 32px;
+  min-height: 100vh;
+}
+.screen[hidden] { display: none; }
+.screen--dark { background: var(--ink); color: var(--white); }
+
+/* ---------- Text ---------- */
+h1, h2, p { margin: 0; }
+.display { font-family: var(--display); font-weight: 800; font-size: 34px; line-height: 1.05; }
+.display-2 { font-family: var(--display); font-weight: 800; font-size: 26px; }
+.display-3 { font-family: var(--display); font-weight: 800; font-size: 23px; margin-bottom: 6px; }
+.lead { font-size: 20px; color: inherit; }
+.muted { color: var(--muted); }
+.small { font-size: 16px; }
+.bold { font-weight: 700; }
+.center { text-align: center; }
+.stack { display: flex; flex-direction: column; gap: 12px; align-items: inherit; }
+.stack-12 { display: flex; flex-direction: column; gap: 12px; margin-top: -8px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+/* ---------- 1. Card ---------- */
+.card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  color: var(--ink);
+}
+.card--shadow { box-shadow: 5px 5px 0 var(--ink); border-radius: 22px; }
+
+/* ---------- 2. Button ---------- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 60px;
+  padding: 0 16px;
+  background: var(--white);
+  color: var(--ink);
+  border: var(--border);
+  border-radius: 16px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 19px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.intro { display: flex; flex-direction: column; gap: 6px; }
+.btn--shadow, .btn--ink, .btn--yellow, .btn--tile, .btn--back { box-shadow: var(--shadow); }
+.btn:active { transform: translate(4px, 4px); box-shadow: none; }
+.btn:focus-visible, .check-this:focus-visible, .shutter:focus-visible, .textarea:focus-visible {
+  outline: 4px solid #1A5FD0; outline-offset: 3px;
+}
+.btn--ink { background: var(--ink); color: var(--white); font-size: 21px; min-height: 62px; }
+.btn--yellow { background: var(--yellow); }
+.btn--back { align-self: flex-start; min-height: 52px; padding: 0 16px 0 10px; border-radius: 14px; box-shadow: 3px 3px 0 var(--ink); }
+.btn--on-dark { border-color: var(--white); box-shadow: none; }
+.btn--outline-light { background: transparent; color: var(--white); border-color: var(--white); }
+.btn--tile {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-height: 116px;
+  padding: 14px 16px;
+  text-align: left;
+  white-space: normal;
+}
+
+/* ---------- 3. Tag ---------- */
+.tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+/* ---------- Colors ---------- */
+.bg-white { background: var(--white); }
+.bg-yellow { background: var(--yellow); }
+.bg-peach { background: var(--peach); }
+.bg-mint { background: var(--mint); }
+.bg-sky { background: var(--sky); }
+.bg-scam { background: var(--scam); }
+.bg-careful { background: var(--careful); }
+.bg-safe { background: var(--safe); }
+
+/* ---------- Home ---------- */
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-dot { width: 26px; height: 26px; border-radius: 50%; border: var(--border); background: var(--yellow); }
+.brand-name { font-family: var(--display); font-weight: 800; font-size: 24px; }
+
+.check-this {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 260px;
+  background: var(--yellow);
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+.check-this:active { transform: translate(5px, 5px); box-shadow: none; }
+.check-this-icon {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: var(--border); background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+}
+.check-this-title { font-family: var(--display); font-weight: 800; font-size: 38px; line-height: 1; }
+
+.last-check { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; }
+.last-check > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.last-check[hidden] { display: none; }
+
+/* ---------- Camera ---------- */
+.viewfinder {
+  flex: 1 1 auto;
+  min-height: 300px;
+  border: 4px dashed var(--yellow);
+  border-radius: 22px;
+  background: #3A3A3A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px;
+}
+.viewfinder img { max-width: 100%; max-height: 420px; border-radius: 12px; }
+.shutter-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.shutter {
+  width: 92px; height: 92px; border-radius: 50%;
+  border: 3px solid var(--white); background: var(--yellow); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+
+/* ---------- Paste ---------- */
+.textarea { font: inherit; font-size: 19px; width: 100%; resize: vertical; min-height: 200px; }
+
+/* ---------- Checking ---------- */
+.big-dot {
+  width: 116px; height: 116px; border-radius: 50%;
+  border: var(--border); box-shadow: var(--shadow); background: var(--yellow);
+  display: flex; align-items: center; justify-content: center; margin: 12px auto 0;
+}
+.steps { list-style: none; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+.steps li { display: flex; align-items: center; gap: 12px; }
+.step-box {
+  width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--ink);
+  background: var(--white); display: flex; align-items: center; justify-content: center;
+  font-weight: 700; flex: none;
+}
+.steps li.active span:last-child { font-weight: 700; }
+.steps li.active .step-box { background: var(--yellow); }
+.steps li.active .step-box::after { content: "…"; }
+.steps li.done .step-box { background: var(--mint); }
+.steps li.done .step-box::after { content: "✓"; }
+.note { display: flex; align-items: center; gap: 12px; font-size: 17px; }
+
+/* ---------- Result ---------- */
+.verdict { display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+.verdict-row { display: flex; align-items: center; gap: 14px; }
+.shown-text { margin-top: 8px; font-size: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.reason { display: flex; align-items: center; gap: 14px; }
+.reason-num {
+  width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: center; font-weight: 700; flex: none;
+}
+.advice { font-size: 19px; }

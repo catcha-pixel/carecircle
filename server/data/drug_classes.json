@@ -1,0 +1,93 @@
+{
+  "_about": "Drug groups that FDA labels often name instead of a single drug (for example, 'NSAIDs'). If a label mentions a group, every drug listed in that group counts as mentioned. 'terms' are the words searched for in label text.",
+  "groups": {
+    "nsaid": {
+      "terms": ["NSAID", "NSAIDs", "nonsteroidal anti-inflammatory", "non-steroidal anti-inflammatory"],
+      "members": ["ibuprofen", "naproxen", "aspirin", "diclofenac", "meloxicam", "celecoxib", "indomethacin", "ketorolac", "etodolac", "nabumetone"]
+    },
+    "anticoagulant": {
+      "terms": ["anticoagulant", "anticoagulants", "blood thinner", "blood thinners", "blood thinning"],
+      "members": ["warfarin", "apixaban", "rivaroxaban", "dabigatran", "edoxaban", "heparin", "enoxaparin"]
+    },
+    "antiplatelet": {
+      "terms": ["antiplatelet", "platelet inhibitor", "platelet inhibitors"],
+      "members": ["clopidogrel", "prasugrel", "ticagrelor", "aspirin"]
+    },
+    "ace_inhibitor": {
+      "terms": ["ACE inhibitor", "ACE inhibitors", "angiotensin-converting enzyme inhibitor", "angiotensin converting enzyme inhibitor"],
+      "members": ["lisinopril", "enalapril", "ramipril", "benazepril", "captopril", "quinapril", "fosinopril"]
+    },
+    "arb": {
+      "terms": ["angiotensin receptor blocker", "angiotensin receptor blockers", "angiotensin II receptor blocker", "angiotensin II receptor blockers", "ARB", "ARBs"],
+      "members": ["losartan", "valsartan", "irbesartan", "olmesartan", "candesartan", "telmisartan"]
+    },
+    "diuretic": {
+      "terms": ["diuretic", "diuretics", "water pill", "water pills"],
+      "members": ["hydrochlorothiazide", "furosemide", "chlorthalidone", "bumetanide", "torsemide", "spironolactone", "triamterene", "amiloride", "eplerenone"]
+    },
+    "potassium_sparing": {
+      "terms": ["potassium-sparing diuretic", "potassium-sparing diuretics", "potassium sparing diuretic", "potassium sparing diuretics"],
+      "members": ["spironolactone", "triamterene", "amiloride", "eplerenone"]
+    },
+    "potassium": {
+      "terms": ["potassium supplement", "potassium supplements", "potassium-containing", "potassium salt", "potassium salts", "potassium chloride"],
+      "members": ["potassium chloride"]
+    },
+    "ssri": {
+      "terms": ["SSRI", "SSRIs", "selective serotonin reuptake inhibitor", "selective serotonin reuptake inhibitors"],
+      "members": ["sertraline", "fluoxetine", "citalopram", "escitalopram", "paroxetine"]
+    },
+    "snri": {
+      "terms": ["SNRI", "SNRIs", "serotonin and norepinephrine reuptake inhibitor", "serotonin and norepinephrine reuptake inhibitors", "serotonin-norepinephrine reuptake inhibitor", "serotonin-norepinephrine reuptake inhibitors"],
+      "members": ["duloxetine", "venlafaxine", "desvenlafaxine"]
+    },
+    "serotonergic": {
+      "terms": ["serotonergic"],
+      "members": ["sertraline", "fluoxetine", "citalopram", "escitalopram", "paroxetine", "duloxetine", "venlafaxine", "desvenlafaxine", "tramadol", "trazodone", "sumatriptan"]
+    },
+    "opioid": {
+      "terms": ["opioid", "opioids", "narcotic", "narcotics"],
+      "members": ["oxycodone", "hydrocodone", "morphine", "tramadol", "codeine", "hydromorphone", "fentanyl", "methadone"]
+    },
+    "benzodiazepine": {
+      "terms": ["benzodiazepine", "benzodiazepines"],
+      "members": ["alprazolam", "lorazepam", "diazepam", "clonazepam", "temazepam"]
+    },
+    "cns_depressant": {
+      "terms": ["CNS depressant", "CNS depressants", "central nervous system depressant", "central nervous system depressants"],
+      "members": ["oxycodone", "hydrocodone", "morphine", "tramadol", "codeine", "hydromorphone", "methadone", "alprazolam", "lorazepam", "diazepam", "clonazepam", "temazepam", "gabapentin", "pregabalin", "zolpidem"]
+    },
+    "insulin": {
+      "terms": ["insulin", "insulins"],
+      "members": ["insulin", "insulin glargine", "insulin lispro", "insulin aspart", "insulin detemir"]
+    },
+    "sulfonylurea": {
+      "terms": ["sulfonylurea", "sulfonylureas", "insulin secretagogue", "insulin secretagogues"],
+      "members": ["glipizide", "glyburide", "glimepiride"]
+    },
+    "antidiabetic": {
+      "terms": ["antidiabetic", "antidiabetic agents", "hypoglycemic agent", "hypoglycemic agents", "antihyperglycemic"],
+      "members": ["metformin", "glipizide", "glyburide", "glimepiride", "pioglitazone", "sitagliptin", "insulin", "insulin glargine", "insulin lispro", "insulin aspart", "insulin detemir"]
+    },
+    "statin": {
+      "terms": ["statin", "statins", "HMG-CoA reductase inhibitor", "HMG-CoA reductase inhibitors"],
+      "members": ["atorvastatin", "simvastatin", "rosuvastatin", "pravastatin", "lovastatin"]
+    },
+    "beta_blocker": {
+      "terms": ["beta-blocker", "beta-blockers", "beta blocker", "beta blockers", "beta-adrenergic blocking agent", "beta-adrenergic blocking agents"],
+      "members": ["metoprolol", "atenolol", "carvedilol", "propranolol", "bisoprolol", "nebivolol"]
+    },
+    "calcium_channel_blocker": {
+      "terms": ["calcium channel blocker", "calcium channel blockers"],
+      "members": ["amlodipine", "diltiazem", "verapamil", "nifedipine"]
+    },
+    "maoi": {
+      "terms": ["MAO inhibitor", "MAO inhibitors", "monoamine oxidase inhibitor", "monoamine oxidase inhibitors", "MAOI", "MAOIs"],
+      "members": ["phenelzine", "selegiline", "rasagiline", "tranylcypromine"]
+    },
+    "thyroid": {
+      "terms": ["thyroid hormone", "thyroid hormones"],
+      "members": ["levothyroxine"]
+    }
+  }
+}

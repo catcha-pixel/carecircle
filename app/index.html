@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>CareCircle</title>
-  <meta name="description" content="Check a text, letter, or pill before you act.">
+  <meta name="description" content="Check a message or a pill before you act.">
   <meta name="theme-color" content="#FFF8EC">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png">
@@ -13,14 +13,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <!-- Tesseract.js reads text from photos right in the browser, so photos never leave the phone. -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="vendor/tesseract/tesseract.min.js" defer></script>
+  <script src="js/ocr.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/scam.js" defer></script>
+  <script src="js/pills.js" defer></script>
 </head>
 <body>
 <main class="page">
 
-  <!-- ============ HOME ============ -->
+  <!-- ================= HOME ================= -->
   <section id="home" class="screen">
     <div class="brand">
       <span class="brand-dot" aria-hidden="true"></span>
@@ -31,12 +33,12 @@
       <p class="lead">Not sure about something? Check it first.</p>
     </div>
 
-    <button type="button" class="card card--shadow check-this" data-go="camera">
-      <span class="check-this-icon">
-        <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+    <button type="button" class="card card--shadow big-action" data-go="scan">
+      <span class="big-action-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
       </span>
-      <span class="check-this-title">Check This</span>
-      <span>Snap a text, a letter, or a pill</span>
+      <span class="big-action-title">Check a message</span>
+      <span>A text, email, or letter</span>
     </button>
 
     <div class="grid-2">
@@ -44,48 +46,49 @@
         <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6v3H9z"/><path d="M9 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-3"/><path d="M8.5 12h7M8.5 16h5"/></svg>
         <span>Paste a message</span>
       </button>
-      <button type="button" class="btn btn--tile bg-mint" data-go="circle">
-        <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.4 5 2.8 5 5.8"/></svg>
-        <span>My circle</span>
+      <button type="button" class="btn btn--tile bg-mint" data-go="pill-menu">
+        <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-35 12 12)"/><path d="M9.2 7.9l5.6 8.2"/></svg>
+        <span>Pill Check</span>
       </button>
     </div>
 
     <div id="last-check" class="card last-check" hidden>
       <div>
-        <span class="muted small">Last check</span>
+        <span class="muted small">Last message check</span>
         <span id="last-check-text" class="bold"></span>
       </div>
       <span id="last-check-tag" class="tag"></span>
     </div>
   </section>
 
-  <!-- ============ CAMERA ============ -->
-  <section id="camera" class="screen screen--dark" hidden>
-    <button type="button" class="btn btn--back btn--on-dark" data-go="home">
+  <!-- ================= SCAN A MESSAGE ================= -->
+  <section id="scan" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="home">
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      <span>Back</span>
+      <span>Home</span>
     </button>
-    <p class="lead center">Take a clear photo of the words. Fill the screen and use good light.</p>
+    <h1 class="display">Check a message</h1>
 
-    <div class="viewfinder">
-      <img id="photo-preview" alt="Your photo" hidden>
-      <p id="viewfinder-hint" class="center">Your photo will show here</p>
+    <button type="button" class="btn btn--big bg-yellow" data-pick="scan-camera">
+      <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Take a photo</span>
+    </button>
+    <button type="button" class="btn btn--big" data-pick="scan-gallery">
+      <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>
+      <span>Choose a screenshot</span>
+    </button>
+    <input id="scan-camera" type="file" accept="image/*" capture="environment" hidden>
+    <input id="scan-gallery" type="file" accept="image/*" hidden>
+
+    <div class="card bg-sky stack-8">
+      <h2 class="display-3">Tips</h2>
+      <p><strong>A text on your phone?</strong> Take a screenshot (on most phones, press the power and volume-up buttons together), then tap <strong>Choose a screenshot</strong>.</p>
+      <p><strong>A letter or another screen?</strong> Tap <strong>Take a photo</strong>. Fill the photo with the words and use good light.</p>
     </div>
-
-    <!-- On phones, this opens the camera. The photo is read on this device. -->
-    <input id="photo-input" type="file" accept="image/*" capture="environment" hidden>
-
-    <div class="shutter-wrap">
-      <button type="button" id="shutter" class="shutter" aria-label="Take photo">
-        <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
-      </button>
-      <span id="shutter-label" class="bold">Take photo</span>
-    </div>
-    <button type="button" id="check-photo" class="btn btn--yellow" hidden>Check this photo</button>
-    <button type="button" class="btn btn--outline-light" data-go="paste">Paste text instead</button>
+    <button type="button" class="btn" data-go="paste">Type or paste it instead</button>
   </section>
 
-  <!-- ============ PASTE ============ -->
+  <!-- ================= PASTE ================= -->
   <section id="paste" class="screen" hidden>
     <button type="button" class="btn btn--back" data-go="home">
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -94,12 +97,13 @@
     <h1 class="display">Paste a message</h1>
     <label for="paste-text" class="lead">Copy the text, email, or message, then paste it here.</label>
     <textarea id="paste-text" class="card textarea" rows="8" placeholder="Paste the message here"></textarea>
+    <p id="paste-error" class="field-error" role="alert" hidden>Please paste or type a message first.</p>
     <button type="button" id="check-paste" class="btn btn--ink">Check this message</button>
   </section>
 
-  <!-- ============ CHECKING ============ -->
-  <section id="checking" class="screen" hidden>
-    <button type="button" id="cancel-check" class="btn btn--back">
+  <!-- ================= WORKING (shared) ================= -->
+  <section id="working" class="screen" hidden>
+    <button type="button" id="cancel-work" class="btn btn--back">
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       <span>Cancel</span>
     </button>
@@ -107,26 +111,22 @@
       <span class="big-dot">
         <svg width="54" height="54" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg>
       </span>
-      <h1 class="display">Checking it for you…</h1>
-      <p class="lead" id="checking-sub">This takes a few seconds.</p>
+      <h1 id="working-title" class="display">Checking it for you…</h1>
+      <p id="working-sub" class="lead" aria-live="polite">This takes a few seconds.</p>
     </div>
-    <ul class="card steps" aria-live="polite">
-      <li id="step-read"><span class="step-box"></span><span>Reading the words</span></li>
-      <li id="step-check"><span class="step-box"></span><span>Looking for warning signs</span></li>
-    </ul>
-    <div class="card bg-sky note">
+    <ul id="working-steps" class="card steps"></ul>
+    <div id="working-note" class="card bg-sky note">
       <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-      <span>Your photo stays on this phone. Nothing is saved.</span>
+      <span>Your photo stays on this phone. Only the words are checked, and nothing is saved.</span>
     </div>
   </section>
 
-  <!-- ============ RESULT ============ -->
+  <!-- ================= SCAM RESULT ================= -->
   <section id="result" class="screen" hidden>
     <button type="button" class="btn btn--back" data-go="home">
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       <span>Home</span>
     </button>
-
     <div id="verdict" class="card card--shadow verdict">
       <div class="verdict-row">
         <span id="verdict-icon" aria-hidden="true"></span>
@@ -134,53 +134,205 @@
       </div>
       <span id="verdict-tag" class="tag bg-white"></span>
     </div>
-
     <div class="card">
-      <span class="muted small bold">What you showed us</span>
+      <span class="muted small bold">What we checked</span>
       <p id="shown-text" class="shown-text"></p>
+      <button type="button" id="fix-words" class="link-btn" hidden>Words look wrong? Fix them and check again</button>
     </div>
-
     <h2 id="reasons-heading" class="display-2"></h2>
     <div id="reasons" class="stack-12"></div>
-
     <div class="card bg-sky">
       <h2 class="display-3">What to do</h2>
-      <p id="advice" class="advice"></p>
+      <p id="advice"></p>
     </div>
-
     <div class="grid-2">
-      <button type="button" id="read-aloud" class="btn btn--shadow">
+      <button type="button" class="btn btn--shadow" data-speak="result">
         <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
         <span>Read aloud</span>
       </button>
-      <button type="button" id="tell-family" class="btn btn--shadow bg-mint">
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.4 5 2.8 5 5.8"/></svg>
-        <span>Tell family</span>
+      <button type="button" id="share-result" class="btn btn--shadow bg-mint">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>
+        <span>Share</span>
       </button>
     </div>
     <button type="button" class="btn btn--ink" data-go="home">Done</button>
   </section>
 
-  <!-- ============ ERROR ============ -->
-  <section id="error" class="screen" hidden>
-    <div class="card card--shadow bg-yellow stack">
-      <h1 class="display">Something went wrong</h1>
-      <p id="error-text" class="lead"></p>
-    </div>
-    <button type="button" class="btn btn--ink" data-go="home">Back to home</button>
-  </section>
-
-  <!-- ============ MY CIRCLE (Version 2) ============ -->
-  <section id="circle" class="screen" hidden>
+  <!-- ================= PILL MENU ================= -->
+  <section id="pill-menu" class="screen" hidden>
     <button type="button" class="btn btn--back" data-go="home">
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
       <span>Home</span>
     </button>
-    <h1 class="display">My circle</h1>
-    <div class="card card--shadow bg-mint stack">
-      <p class="lead">Soon you'll be able to add a family member who gets an alert when CareCircle spots a scam.</p>
-      <p class="lead">For now, use <strong>Tell family</strong> on any result to send it to someone you trust.</p>
+    <h1 class="display">Pill Check</h1>
+    <button type="button" class="btn btn--menu bg-yellow" data-pick="label-camera">
+      <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="7" width="12" height="14" rx="2"/><path d="M7 3h10v4H7zM9 12h6M9 15.5h4"/></svg>
+      <span><strong>Read a pill bottle</strong><small>Take a photo of the label</small></span>
+    </button>
+    <input id="label-camera" type="file" accept="image/*" capture="environment" hidden>
+    <button type="button" class="btn btn--menu bg-mint" data-go="pill-id">
+      <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M9 11h6M9 14h4"/></svg>
+      <span><strong>Identify a loose pill</strong><small>By the letters or numbers on it</small></span>
+    </button>
+    <button type="button" class="btn btn--menu bg-peach" data-go="meds">
+      <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg>
+      <span><strong>My medicines</strong><small id="meds-count">Check them for warnings</small></span>
+    </button>
+    <p class="muted small center">Pill Check can make mistakes. Always check with your pharmacist.</p>
+  </section>
+
+  <!-- ================= LABEL RESULT ================= -->
+  <section id="label-result" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="pill-menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <h1 id="label-title" class="display">On this label</h1>
+    <div id="label-meds" class="stack-12"></div>
+    <div id="label-directions" class="card bg-sky" hidden>
+      <h2 class="display-3">Directions</h2>
+      <p id="label-directions-text"></p>
     </div>
+    <details class="card">
+      <summary class="bold">What we read</summary>
+      <p id="label-raw" class="shown-text"></p>
+    </details>
+    <div class="grid-2">
+      <button type="button" class="btn btn--shadow" data-speak="label">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <span>Read aloud</span>
+      </button>
+      <button type="button" class="btn btn--shadow" data-pick="label-camera">Try again</button>
+    </div>
+    <button type="button" class="btn btn--ink" data-go="meds">Go to my medicines</button>
+  </section>
+
+  <!-- ================= IDENTIFY A PILL ================= -->
+  <section id="pill-id" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="pill-menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <h1 class="display">Identify a pill</h1>
+
+    <div class="field">
+      <label for="imprint" class="field-label">1. Letters or numbers on the pill</label>
+      <input id="imprint" class="card input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="For example: M 30">
+      <p class="muted small">Look on both sides. Use a magnifier if you have one.</p>
+      <button type="button" class="btn" data-pick="pill-camera">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Try reading it from a photo</span>
+      </button>
+      <input id="pill-camera" type="file" accept="image/*" capture="environment" hidden>
+      <p id="imprint-status" class="small" aria-live="polite" hidden></p>
+    </div>
+
+    <fieldset class="field">
+      <legend class="field-label">2. Color</legend>
+      <div class="chips" id="color-chips">
+        <button type="button" class="chip" data-color="white"><span class="swatch" style="background:#FFFFFF"></span>White</button>
+        <button type="button" class="chip" data-color="yellow"><span class="swatch" style="background:#F5D547"></span>Yellow</button>
+        <button type="button" class="chip" data-color="orange"><span class="swatch" style="background:#F39A3D"></span>Orange</button>
+        <button type="button" class="chip" data-color="pink"><span class="swatch" style="background:#F4A6C0"></span>Pink</button>
+        <button type="button" class="chip" data-color="red"><span class="swatch" style="background:#D9483B"></span>Red</button>
+        <button type="button" class="chip" data-color="blue"><span class="swatch" style="background:#5B8DEF"></span>Blue</button>
+        <button type="button" class="chip" data-color="green"><span class="swatch" style="background:#5DBB63"></span>Green</button>
+        <button type="button" class="chip" data-color="brown"><span class="swatch" style="background:#9A6B47"></span>Brown</button>
+        <button type="button" class="chip" data-color="gray"><span class="swatch" style="background:#9AA0A6"></span>Gray</button>
+        <button type="button" class="chip" data-color="">Not sure</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="field">
+      <legend class="field-label">3. Shape</legend>
+      <div class="chips" id="shape-chips">
+        <button type="button" class="chip" data-shape="round">Round</button>
+        <button type="button" class="chip" data-shape="oval">Oval</button>
+        <button type="button" class="chip" data-shape="capsule">Capsule</button>
+        <button type="button" class="chip" data-shape="other">Other</button>
+        <button type="button" class="chip" data-shape="">Not sure</button>
+      </div>
+    </fieldset>
+
+    <p id="pill-id-error" class="field-error" role="alert" hidden>Please type the letters or numbers on the pill.</p>
+    <button type="button" id="find-pill" class="btn btn--ink">Find this pill</button>
+  </section>
+
+  <!-- ================= PILL RESULTS ================= -->
+  <section id="pill-results" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="pill-id">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <h1 id="pill-results-title" class="display">Possible matches</h1>
+    <p id="pill-results-sub" class="lead"></p>
+    <div id="pill-candidates" class="stack-12"></div>
+    <div class="card bg-yellow">
+      <p><strong>Always check with your pharmacist</strong> before taking a pill you're not sure about. Many pills look alike, and our list doesn't include pills made after 2021.</p>
+    </div>
+    <button type="button" class="btn btn--ink" data-go="pill-menu">Done</button>
+  </section>
+
+  <!-- ================= MY MEDICINES ================= -->
+  <section id="meds" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="pill-menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <h1 class="display">My medicines</h1>
+    <ul id="meds-list" class="meds-list"></ul>
+    <p id="meds-empty" class="card lead">No medicines yet. Add them below, or read them from a pill bottle.</p>
+
+    <div class="card stack-8">
+      <label for="med-input" class="field-label">Add a medicine</label>
+      <input id="med-input" class="card input" type="text" list="med-suggestions" autocomplete="off" placeholder="Type the name, like lisinopril">
+      <datalist id="med-suggestions"></datalist>
+      <p id="med-error" class="field-error" role="alert" hidden></p>
+      <button type="button" id="add-med" class="btn btn--shadow bg-mint">Add</button>
+    </div>
+
+    <button type="button" id="check-meds" class="btn btn--ink">Check for warnings</button>
+    <p class="muted small center">Your list is saved only on this phone.</p>
+  </section>
+
+  <!-- ================= MEDICINE WARNINGS ================= -->
+  <section id="med-warnings" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="meds">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Back</span>
+    </button>
+    <div id="warn-summary" class="card card--shadow verdict">
+      <h1 id="warn-title" class="display"></h1>
+      <p id="warn-sub"></p>
+    </div>
+    <div id="warn-list" class="stack-12"></div>
+    <div id="warn-missing" class="card" hidden>
+      <p><strong>We couldn't find an FDA label for:</strong> <span id="warn-missing-names"></span>. These weren't checked.</p>
+    </div>
+    <div class="card bg-yellow">
+      <p>This checks what official FDA drug labels say. It is <strong>not</strong> a full safety check. Never stop or change a medicine on your own. Ask your pharmacist or doctor.</p>
+    </div>
+    <div class="grid-2">
+      <button type="button" class="btn btn--shadow" data-speak="warnings">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <span>Read aloud</span>
+      </button>
+      <button type="button" id="share-warnings" class="btn btn--shadow bg-mint">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>
+        <span>Share</span>
+      </button>
+    </div>
+    <button type="button" class="btn btn--ink" data-go="pill-menu">Done</button>
+  </section>
+
+  <!-- ================= ERROR ================= -->
+  <section id="error" class="screen" hidden>
+    <div class="card card--shadow bg-yellow stack">
+      <h1 id="error-title" class="display">Something went wrong</h1>
+      <p id="error-text" class="lead"></p>
+    </div>
+    <button type="button" id="error-retry" class="btn btn--shadow" hidden>Try again</button>
+    <button type="button" class="btn btn--ink" data-go="home">Back to home</button>
   </section>
 
 </main>

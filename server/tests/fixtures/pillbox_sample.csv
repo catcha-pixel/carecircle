@@ -1,0 +1,8 @@
+medicine_name,spl_strength,splimprint,splcolor_text,splshape_text,author,rxstring,splsize
+TEST-ONLY SAMPLE ROWS,,,,,,,
+Alphatestol,10 mg,AB;12,WHITE,ROUND,Test Labs,Alphatestol 10 MG Oral Tablet,8
+Alphatestol,20 mg,AB;20,YELLOW,ROUND,Test Labs,Alphatestol 20 MG Oral Tablet,9
+Betatestine,500 mg,ZX 500,WHITE,OVAL,Sample Pharma,Betatestine 500 MG Oral Tablet,17
+Betatestine,500 mg,ZX 500,WHITE,OVAL,Sample Pharma,Betatestine 500 MG Oral Tablet,17
+Gammatest,5 mg,G5,BLUE;WHITE,CAPSULE,Example Inc,Gammatest 5 MG Oral Capsule,14
+Deltatest,1 mg,AB;12,PINK,ROUND,Other Labs,Deltatest 1 MG Oral Tablet,6

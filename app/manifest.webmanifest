@@ -1,7 +1,7 @@
 {
   "name": "CareCircle",
   "short_name": "CareCircle",
-  "description": "Check a text, letter, or pill before you act.",
+  "description": "Check a message or a pill before you act.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#FFF8EC",

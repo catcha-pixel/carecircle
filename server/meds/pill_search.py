@@ -2,6 +2,7 @@
 
 import gzip
 import json
+import re
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -29,7 +30,17 @@ SHAPE_GROUPS = {
 }
 
 
-LOOK_ALIKES = str.maketrans({"O": "0", "D": "0", "Q": "0", "I": "1", "L": "1", "S": "5", "B": "8", "Z": "2", "G": "6"})
+def ingredient_names(ingredients):
+    """'HYDROCODONE BITARTRATE[HYDROCODONE];ACETAMINOPHEN[ACETAMINOPHEN];'
+    -> [('hydrocodone bitartrate', 'hydrocodone'), ('acetaminophen', 'acetaminophen')]"""
+    text = ingredients or ""
+    pairs = re.findall(r"([^;\[\]/,]+?)\s*\[([^\]]+)\]", text)
+    if not pairs:  # no [brackets]: just names separated by semicolons
+        pairs = [(p, p) for p in text.split(";") if p.strip()]
+    return [(full.strip().lower(), moiety.strip().lower()) for full, moiety in pairs]
+
+
+LOOK_ALIKES =str.maketrans({"O": "0", "D": "0", "Q": "0", "I": "1", "L": "1", "S": "5", "B": "8", "Z": "2", "G": "6"})
 
 
 def look_alike_key(key):
@@ -57,8 +68,18 @@ class PillIndex:
         return bool(self.pills)
 
     def names(self):
-        """Every medicine name in the database (used to spot names on bottle labels)."""
-        return {p["name"] for p in self.pills if p.get("name")}
+        """Active-ingredient names in the database, mapped to their base medicine
+        ('amlodipine besylate' -> 'amlodipine'). Used to spot medicines on bottle labels.
+        Product names aren't used, because some are ordinary words like "Sleep" or "Cold"."""
+        names = {}
+        for p in self.pills:
+            for full, moiety in ingredient_names(p.get("ingredients", "")):
+                if re.search(r"\b(ion|cation|anion)$", moiety):
+                    continue
+                names.setdefault(moiety, moiety)
+                if not re.search(r"\b(ion|cation|anion)$", full):
+                    names.setdefault(full, moiety)
+        return names
 
     def search(self, imprint, color=None, shape=None, limit=6):
         q_key = imprint_key(imprint)
@@ -94,7 +115,9 @@ class PillIndex:
             return 95, "exact"  # same marks, sides read in a different order
         if len(q_key) >= 2 and look_alike_key(q_key) == p["look_alike"]:
             return 85, "close"  # only differs by look-alike characters, like O and 0
-        if len(q_key) >= 3 and (q_key in p["key"] or p["key"] in q_key):
+        # One contains the other (a side wasn't read, or an extra mark was), but not tiny overlaps like "5".
+        short, longer = sorted((q_key, p["key"]), key=len)
+        if len(short) >= 3 and short in longer and len(short) / len(longer) >= 0.6:
             return 70, "partial"
         # Close spelling, for marks that were misread (O vs 0, I vs 1).
         if len(q_key) >= 3 and abs(len(p["key"]) - len(q_key)) <= 2:
@@ -118,12 +141,15 @@ class PillIndex:
         shape_ok = not shape or not SHAPE_GROUPS.get(shape) or p["shape"] in SHAPE_GROUPS[shape]
         if why == "exact" and color_ok and shape_ok:
             match = "strong"
-        elif why in ("exact", "partial") and (color_ok or shape_ok):
+        elif why in ("exact", "partial", "close") and (color_ok or shape_ok):
             match = "possible"
         else:
             match = "weak"
+        ingredients = ingredient_names(p.get("ingredients", ""))
         return {
             "name": p["name"],
+            # The single active ingredient, used for the medicine list and FDA label lookups.
+            "generic": ingredients[0][1] if len(ingredients) == 1 else "",
             "strength": p["strength"],
             "imprint": p["imprint"],
             "colors": [c.title() for c in p["colors"]],

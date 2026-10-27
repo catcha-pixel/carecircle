@@ -62,18 +62,14 @@ uvicorn api:app --reload --host 0.0.0.0
 
 Open **http://127.0.0.1:8000** for the app, or **/docs** to try the API.
 
-### Set up the pill database (one time)
+### The pill database
+
+`server/data/pill_index.json.gz` holds 32,073 pills built from NLM's Pillbox data, and it's already included. To rebuild it from a fresh download:
 
 1. Download the Pillbox CSV: <https://datadiscovery.nlm.nih.gov/api/v3/views/crzr-uvwg/export.csv?accessType=DOWNLOAD>
-2. From the `server` folder, run:
-   ```bash
-   python -m meds.build_pill_index path/to/the/downloaded.csv
-   ```
-3. This creates `server/data/pill_index.json.gz`. Commit it, so your live server has it too.
+2. From the `server` folder, run `python -m meds.build_pill_index path/to/export.csv`
 
-Until then, "Identify a loose pill" says it isn't set up yet. Everything else works.
-
-Visit `/health` to check: it shows `"pill_database": true` and the number of pills once it's installed.
+Visit `/health` to check: it shows `"pill_database": true` and the number of pills.
 
 ### Optional: openFDA API key
 Without a key, openFDA allows 1,000 requests per day. For more, get a free key at open.fda.gov and set the environment variable `OPENFDA_API_KEY` (on Render: **Environment → Add Environment Variable**).
@@ -83,7 +79,7 @@ Without a key, openFDA allows 1,000 requests per day. For more, get a free key a
 ```bash
 cd server
 pip install -r requirements-dev.txt
-python -m pytest tests          # 34 tests: scam check, pill search, label reading, warnings, API
+python -m pytest tests          # 37 tests: scam check, pill search, label reading, warnings, API
 cd scam_check
 python evaluate.py ../data/holdout_test.csv   # scam accuracy on unseen messages
 ```

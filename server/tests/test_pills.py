@@ -23,6 +23,14 @@ def test_imprint_key_ignores_spaces_and_separators():
     assert imprint_key("AB;12") == imprint_key("ab 12") == "AB12"
 
 
+def test_strength_is_cleaned_up():
+    from meds.build_pill_index import clean_strength
+    assert clean_strength("TEMAZEPAM 15 mg;", "Temazepam") == "15 mg"
+    assert clean_strength("ACETAMINOPHEN 325 mg;HYDROCODONE BITARTRATE 5 mg;", "x") == \
+        "Acetaminophen 325 mg, Hydrocodone Bitartrate 5 mg"
+    assert clean_strength("10 mg", "x") == "10 mg"
+
+
 def test_build_skips_blank_imprints_and_duplicates():
     pills = build(FIXTURES / "pillbox_sample.csv")
     names = [p["name"] for p in pills]

@@ -251,7 +251,7 @@ function showPillResults(res, imprint) {
     add.type = "button";
     add.style.whiteSpace = "normal";
     add.addEventListener("click", () => {
-      addMed(p.name, p.strength);
+      addMed(p.generic || p.name, p.strength); // the ingredient name works best for FDA label checks
       add.textContent = "Added ✓";
       add.disabled = true;
     });

@@ -58,6 +58,22 @@ def test_ignores_ordinary_words(names):
     assert names.find_in_text("TAKE WITH FOOD. REFILLS: 2. DOCTOR SMITH")["medicines"] == []
 
 
+def test_salt_names_and_combination_strengths():
+    names = DrugNames(extra_names={"amlodipine besylate": "amlodipine", "atorvastatin calcium": "atorvastatin"})
+    result = names.find_in_text("ATORVASTATIN CALCIUM 40 MG TAB\nAMLODIPINE BESYLATE 5MG\nHYDROCODONE/APAP 10-325 MG")
+    found = {m["name"]: m["strength"] for m in result["medicines"]}
+    assert found["atorvastatin"] == "40 mg" and "calcium" not in found
+    assert found["amlodipine"] == "5 mg"
+    assert found["acetaminophen"] == "10-325 mg"
+
+
+def test_picks_single_medicine_label_over_combination():
+    from meds.interactions import _label_fit
+    combo = {"openfda": {"generic_name": ["AMLODIPINE AND BENAZEPRIL HYDROCHLORIDE"]}, "drug_interactions": ["x"]}
+    single = {"openfda": {"generic_name": ["AMLODIPINE BESYLATE"]}}
+    assert _label_fit("amlodipine", single) > _label_fit("amlodipine", combo)
+
+
 def test_suggestions(names):
     suggestions = [s["name"] for s in names.suggest("lisin")]
     assert "lisinopril" in suggestions

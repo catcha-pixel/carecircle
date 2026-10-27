@@ -7,7 +7,8 @@ from pathlib import Path
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 
-STRENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(MG|MCG|MEQ|G|ML|UNITS?|IU|%)\b", re.IGNORECASE)
+# "10 MG", "10MG", and combination strengths like "10-325 MG" or "10/325 MG"
+STRENGTH_RE = re.compile(r"(\d+(?:\.\d+)?(?:\s*[-/]\s*\d+(?:\.\d+)?)?)\s*(MG|MCG|MEQ|G|ML|UNITS?|IU|%)\b", re.IGNORECASE)
 OCR_DIGIT_FIXES = str.maketrans({"0": "o", "1": "l", "5": "s", "8": "b"})
 # Directions start with a word like TAKE and often wrap onto a short second line ("DAILY").
 DIRECTIONS_RE = re.compile(
@@ -23,7 +24,9 @@ def _clean(name):
 
 class DrugNames:
     def __init__(self, extra_names=()):
+        """extra_names: names from the pill database, as a list or as {name: base name}."""
         self.generics = set()
+        self.base = {}  # salt form -> base medicine, like "amlodipine besylate" -> "amlodipine"
         for line in (DATA / "common_drugs.txt").read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if line and not line.startswith("#"):
@@ -35,10 +38,13 @@ class DrugNames:
                 self.brands[_clean(row["brand"])] = _clean(row["generic"])
 
         # Simple one- or two-word names from the pill database (skip long product titles).
-        for name in extra_names:
-            n = _clean(name)
+        pairs = extra_names.items() if isinstance(extra_names, dict) else ((n, n) for n in extra_names)
+        for name, base in pairs:
+            n, b = _clean(name), _clean(base)
             if 4 <= len(n) <= 30 and len(n.split()) <= 2 and n.replace(" ", "").isalpha():
                 self.generics.add(n)
+                if b != n and b.replace(" ", "").isalpha():
+                    self.base[n] = b
 
         self.all_names = self.generics | set(self.brands)
         self.one_word = {n for n in self.all_names if " " not in n}
@@ -46,7 +52,8 @@ class DrugNames:
 
     def generic_for(self, name):
         n = _clean(name)
-        return self.brands.get(n, n)
+        n = self.brands.get(n, n)
+        return self.base.get(n, n)
 
     def suggest(self, query, limit=8):
         """Names that start with what the person has typed so far."""
@@ -84,11 +91,16 @@ class DrugNames:
                 "exact": exact,
             }
 
+        skip_next = False
         for i, (w, start, end, clean) in enumerate(words):
+            if skip_next:  # second word of a two-word name, like "calcium" in "atorvastatin calcium"
+                skip_next = False
+                continue
             if i + 1 < len(words):
                 pair = f"{w} {words[i + 1][0]}"
                 if pair in self.two_word:
                     add(pair, start, words[i + 1][2], clean and words[i + 1][3])
+                    skip_next = True
                     continue
             if len(w) < 4:
                 continue

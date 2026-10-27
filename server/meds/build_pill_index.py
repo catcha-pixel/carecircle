@@ -66,6 +66,16 @@ def to_words(value, codes):
     return out
 
 
+def clean_strength(raw, name):
+    """'TEMAZEPAM 15 mg;' -> '15 mg'.  Combination pills keep each part:
+    'ACETAMINOPHEN 325 mg;HYDROCODONE BITARTRATE 5 mg;' -> 'Acetaminophen 325 mg, Hydrocodone Bitartrate 5 mg'."""
+    parts = [p.strip() for p in raw.split(";") if p.strip()]
+    if len(parts) == 1:
+        m = re.search(r"(\d[\d.,/]*\s*\S+)$", parts[0])  # the amount and unit at the end
+        return m.group(1) if m else parts[0]
+    return ", ".join(p.title().replace(" Mg", " mg").replace(" Mcg", " mcg").replace(" Ml", " mL") for p in parts)
+
+
 def resolve_columns(header):
     lower = {h.lower().strip(): h for h in header}
     found = {}
@@ -90,21 +100,27 @@ def build(csv_path):
         reader = csv.DictReader(f)
         cols = resolve_columns(reader.fieldnames or [])
         get = lambda row, key: (row.get(cols[key]) or "").strip() if key in cols else ""
+        # NLM added corrected values in "pillbox_*" columns; use them when they're filled in.
+        lower = {h.lower(): h for h in reader.fieldnames}
+        fix = lambda row, key, column: (row.get(lower.get(column, ""), "") or "").strip() or get(row, key)
+        enabled_col = lower.get("enabled?")
         for row in reader:
-            imprint = get(row, "imprint")
+            if enabled_col and row.get(enabled_col, "").strip().lower() == "false":
+                continue  # NLM switched this record off
+            imprint = fix(row, "imprint", "pillbox_imprint")
             key = imprint_key(imprint)
             if not key:
                 continue  # can't identify a pill with no marking
             name = get(row, "name").strip()
-            strength = get(row, "strength")
-            colors = to_words(get(row, "color"), SPL_COLORS)
-            shape = (to_words(get(row, "shape"), SPL_SHAPES) or [""])[0]
+            strength = clean_strength(get(row, "strength"), name)
+            colors = to_words(fix(row, "color", "pillbox_color_text"), SPL_COLORS)
+            shape = (to_words(fix(row, "shape", "pillbox_shape_text"), SPL_SHAPES) or [""])[0]
             dedupe = (key, name.upper(), strength.upper(), tuple(colors), shape)
             if dedupe in seen:
                 continue
             seen.add(dedupe)
             pills.append({
-                "name": name.title() if name.isupper() else name,
+                "name": name.title() if name.isupper() or name.islower() else name,
                 "strength": strength,
                 "imprint": imprint.replace(";", " / "),
                 "key": key,

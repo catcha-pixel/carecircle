@@ -48,13 +48,27 @@ def fetch_label_from_openfda(name, timeout=8):
         results = data.get("results", [])
         if not results:
             continue
-        # Prefer a label for this medicine alone, not a combination pill.
-        want = name.upper()
-        best = next((r for r in results if want in [g.upper() for g in r.get("openfda", {}).get("generic_name", [])]), results[0])
+        best = max(results, key=lambda r: _label_fit(name, r))
         text = " ".join(" ".join(best.get(s, [])) for s in SECTIONS if best.get(s))
         if text.strip():
             return text
     return None
+
+
+def _label_fit(name, result):
+    """Prefer a label for this medicine alone ('AMLODIPINE BESYLATE'), not a combination pill
+    ('AMLODIPINE AND BENAZEPRIL'). Labels with an interactions section win ties."""
+    want = name.upper()
+    best = 0
+    for g in result.get("openfda", {}).get("generic_name", []):
+        g = g.upper()
+        if g == want:
+            best = max(best, 3)
+        elif g.startswith(want) and " AND " not in g:
+            best = max(best, 2)
+        elif want in g:
+            best = max(best, 1)
+    return best * 2 + (1 if result.get("drug_interactions") else 0)
 
 
 class InteractionChecker:

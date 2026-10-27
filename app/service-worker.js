@@ -3,10 +3,10 @@
 // The text reader (vendor/): saved after the first download, since it's large and never changes.
 // Checking messages and pills still needs internet.
 
-const CACHE = "carecircle-v2";
+const CACHE = "carecircle-v3";
 const APP_SHELL = [
   "./", "./index.html", "./styles.css", "./manifest.webmanifest", "./icons/icon-192.png",
-  "./js/ocr.js", "./js/app.js", "./js/scam.js", "./js/pills.js",
+  "./js/ocr.js", "./js/app.js", "./js/scam.js", "./js/pills.js", "./js/contacts.js",
 ];
 
 self.addEventListener("install", (event) => {

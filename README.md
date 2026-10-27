@@ -17,6 +17,10 @@ CareCircle helps older adults spot scams and understand their medicines. Take a 
 - **Identify a loose pill:** type the letters and numbers stamped on it (or try reading them from a photo), pick the color and shape, and see possible matches.
 - **My medicines:** a list saved only on the phone. **Check for warnings** fetches each medicine's official FDA label and shows the label's own words wherever it mentions another medicine on the list, or its drug group (for example, "NSAIDs" covers ibuprofen).
 
+**Call or text someone**
+- Save people you trust (family, a friend, your pharmacy) and reach them with big **Call** and **Text** buttons, using the phone's own Phone and Messages apps.
+- From a scam result or a medicine warning, **Ask someone I trust** opens the list with a text already written about what you checked. Nothing is ever sent automatically, and contacts are saved only on the phone.
+
 **Everywhere:** large text and buttons, Read aloud, Share, and it installs to the home screen.
 
 ## How it works
@@ -96,6 +100,7 @@ app/                      Web app (HTML, CSS, JavaScript). No build step.
   js/app.js               Screens, server calls, saving, read aloud, share
   js/scam.js              Check a message
   js/pills.js             Pill Check and My medicines
+  js/contacts.js          Call or text someone
   vendor/tesseract/       Bundled text reader (so it works without loading code from other sites)
   service-worker.js       Install + offline screens
 server/
@@ -119,7 +124,7 @@ Same settings as before:
 
 - Photos are read on the phone. Only the words are sent to the server.
 - Messages are checked in memory and never stored.
-- Your medicine list and last result are saved only on your phone.
+- Your medicine list, contacts, and last result are saved only on your phone.
 - Medicine names are sent to openFDA only to look up their public labels.
 
 ## Credits

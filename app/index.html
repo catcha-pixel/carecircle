@@ -18,6 +18,7 @@
   <script src="js/app.js" defer></script>
   <script src="js/scam.js" defer></script>
   <script src="js/pills.js" defer></script>
+  <script src="js/contacts.js" defer></script>
 </head>
 <body>
 <main class="page">
@@ -51,6 +52,11 @@
         <span>Pill Check</span>
       </button>
     </div>
+
+    <button type="button" class="btn btn--menu bg-sky" data-go="contacts">
+      <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>
+      <span><strong>Call or text someone</strong><small>Ask someone you trust before you act</small></span>
+    </button>
 
     <div id="last-check" class="card last-check" hidden>
       <div>
@@ -155,7 +161,36 @@
         <span>Share</span>
       </button>
     </div>
+    <button type="button" class="btn btn--shadow bg-sky" data-contact-about="result">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>
+      <span>Ask someone I trust</span>
+    </button>
     <button type="button" class="btn btn--ink" data-go="home">Done</button>
+  </section>
+
+  <!-- ================= CALL OR TEXT ================= -->
+  <section id="contacts" class="screen" hidden>
+    <button type="button" class="btn btn--back" data-go="home">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <span>Home</span>
+    </button>
+    <h1 class="display">Call or text someone</h1>
+    <p id="contacts-about" class="card bg-yellow" hidden></p>
+    <ul id="contacts-list" class="contacts-list"></ul>
+    <p id="contacts-empty" class="lead">Save people you trust, like family, a friend, your doctor, or your pharmacy. Then you can reach them with one tap.</p>
+
+    <details id="add-contact-box" class="card">
+      <summary class="bold">Add a person</summary>
+      <div class="stack-12 add-contact">
+        <label for="contact-name" class="field-label">Name</label>
+        <input id="contact-name" class="card input" type="text" autocomplete="name" placeholder="For example: Daniel">
+        <label for="contact-phone" class="field-label">Phone number</label>
+        <input id="contact-phone" class="card input" type="tel" inputmode="tel" autocomplete="tel" placeholder="(555) 123-4567">
+        <p id="contact-error" class="field-error" role="alert" hidden></p>
+        <button type="button" id="add-contact" class="btn btn--shadow bg-mint">Save</button>
+      </div>
+    </details>
+    <p class="muted small center">Saved only on this phone. CareCircle never contacts anyone for you.</p>
   </section>
 
   <!-- ================= PILL MENU ================= -->
@@ -322,6 +357,10 @@
         <span>Share</span>
       </button>
     </div>
+    <button type="button" class="btn btn--shadow bg-sky" data-contact-about="warnings">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></svg>
+      <span>Call or text someone</span>
+    </button>
     <button type="button" class="btn btn--ink" data-go="pill-menu">Done</button>
   </section>
 
